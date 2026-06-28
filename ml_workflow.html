@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Factory — ML Workflow & Algorithm Steps</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+
+    /* ══════════════════════════════════════
+       SCREEN STYLES
+    ══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #1a2332;
+      font-size: 10.5pt;
+      line-height: 1.65;
+    }
+
+    .page-wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2.5rem 2.5rem;
+      box-shadow: 0 4px 40px rgba(0,0,0,.12);
+      min-height: 100vh;
+    }
+
+    /* ── Print Button ── */
+    .print-btn {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+      background: #1e40af; color: #fff; border: none; border-radius: 50px;
+      padding: 11px 24px; font-size: 10pt; font-weight: 700; cursor: pointer;
+      box-shadow: 0 6px 24px rgba(30,64,175,.4); font-family: 'Inter', sans-serif;
+      transition: transform .2s, box-shadow .2s; display: flex; align-items: center; gap: 7px;
+    }
+    .print-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(30,64,175,.5); }
+
+    /* ── Cover ── */
+    .cover {
+      background: linear-gradient(135deg, #0a1628 0%, #1e3a6e 50%, #0f2855 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .cover-badge {
+      display: inline-block;
+      border: 1px solid rgba(100,180,255,.5);
+      background: rgba(100,180,255,.1);
+      border-radius: 99px; padding: 4px 18px;
+      font-size: 7.5pt; letter-spacing: .15em; text-transform: uppercase;
+      color: #7dd3fc; margin-bottom: .8rem;
+    }
+    .cover-title {
+      font-size: 22pt; font-weight: 900; color: #fff;
+      margin-bottom: .4rem; line-height: 1.2;
+    }
+    .cover-title span { color: #60a5fa; }
+    .cover-sub { font-size: 10pt; color: rgba(255,255,255,.65); margin-bottom: 1.2rem; }
+    .cover-divider { width: 60px; height: 3px; background: linear-gradient(90deg, #60a5fa, #34d399); margin: 1rem auto; border-radius: 99px; }
+    .cover-meta { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+    .meta-item { text-align: center; }
+    .meta-label { font-size: 7pt; text-transform: uppercase; letter-spacing: .12em; color: rgba(255,255,255,.45); }
+    .meta-val { font-size: 10pt; font-weight: 700; color: #93c5fd; }
+
+    /* ── Section Header ── */
+    .sh {
+      display: flex; align-items: center; gap: 10px;
+      margin: 2rem 0 1rem;
+      padding-bottom: 8px;
+      border-bottom: 2.5px solid #1e40af;
+    }
+    .sh-num {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: #1e40af; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 10pt; color: #fff; flex-shrink: 0;
+    }
+    .sh-title { font-size: 14pt; font-weight: 800; color: #0f172a; }
+    .sh.green { border-color: #059669; }
+    .sh.green .sh-num { background: #059669; }
+    .sh.purple { border-color: #7c3aed; }
+    .sh.purple .sh-num { background: #7c3aed; }
+    .sh.amber { border-color: #d97706; }
+    .sh.amber .sh-num { background: #d97706; }
+    .sh.red { border-color: #dc2626; }
+    .sh.red .sh-num { background: #dc2626; }
+
+    /* ── Card ── */
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.1rem 1.3rem;
+      margin-bottom: 1rem;
+    }
+    .card.blue   { border-left: 4px solid #3b82f6; }
+    .card.green  { border-left: 4px solid #10b981; }
+    .card.red    { border-left: 4px solid #ef4444; }
+    .card.amber  { border-left: 4px solid #f59e0b; }
+    .card.purple { border-left: 4px solid #8b5cf6; }
+    .card-title { font-size: 10.5pt; font-weight: 700; margin-bottom: .5rem; color: #0f172a; }
+
+    /* ── Highlight Box ── */
+    .hb { border-radius: 8px; padding: .8rem 1rem; margin: .7rem 0; font-size: 9pt; }
+    .hb.info    { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e3a5f; }
+    .hb.success { background: #f0fdf4; border-left: 4px solid #22c55e; color: #14532d; }
+    .hb.warn    { background: #fffbeb; border-left: 4px solid #f59e0b; color: #78350f; }
+    .hb.danger  { background: #fff1f2; border-left: 4px solid #f43f5e; color: #881337; }
+
+    /* ── Steps ── */
+    .steps { list-style: none; padding: 0; }
+    .step-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+      padding: .9rem 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-num {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 10pt; color: #fff;
+    }
+    .step-title { font-weight: 700; font-size: 10.5pt; margin-bottom: 3px; }
+    .step-desc  { font-size: 9pt; color: #475569; line-height: 1.65; }
+    .step-code {
+      font-family: 'Courier New', monospace; font-size: 8pt;
+      background: #0f172a; color: #7dd3fc;
+      border-radius: 6px; padding: 8px 12px; margin-top: 7px; white-space: pre;
+      border: 1px solid #1e293b;
+    }
+
+    /* ── Table ── */
+    .tw { border-radius: 10px; overflow: hidden; margin: .8rem 0; border: 1px solid #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    thead tr { background: #1e3a6e; }
+    thead th { padding: 8px 12px; text-align: left; font-weight: 700; color: #fff; font-size: 8pt; text-transform: uppercase; letter-spacing: .05em; }
+    tbody tr { border-bottom: 1px solid #f1f5f9; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 7px 12px; vertical-align: middle; color: #1a2332; }
+    .td-b { color: #1d4ed8; font-weight: 700; font-family: monospace; }
+    .td-g { color: #059669; font-weight: 600; }
+    .td-r { color: #dc2626; font-weight: 600; }
+
+    /* ── Badge ── */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 7.5pt; font-weight: 700; }
+    .b-g { background: #d1fae5; color: #065f46; }
+    .b-r { background: #fee2e2; color: #991b1b; }
+    .b-a { background: #fef3c7; color: #92400e; }
+    .b-b { background: #dbeafe; color: #1e40af; }
+    .b-p { background: #ede9fe; color: #5b21b6; }
+
+    /* ── Grid ── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: .8rem 0; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .8rem; margin: .8rem 0; }
+
+    /* ── Metric tile ── */
+    .mt {
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 1rem; text-align: center;
+      border-top: 3px solid #3b82f6;
+    }
+    .mt.g { border-top-color: #10b981; }
+    .mt.p { border-top-color: #8b5cf6; }
+    .mt.a { border-top-color: #f59e0b; }
+    .mt.r { border-top-color: #ef4444; }
+    .mt-icon { font-size: 18pt; margin-bottom: 4px; }
+    .mt-val  { font-size: 16pt; font-weight: 900; color: #0f172a; line-height: 1; }
+    .mt-lbl  { font-size: 7.5pt; text-transform: uppercase; letter-spacing: .1em; color: #64748b; margin-top: 4px; }
+
+    /* ── Flowchart boxes ── */
+    .flow { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 1.2rem 0; }
+    .fbox {
+      border-radius: 10px; padding: .65rem 1.1rem; font-size: 9pt; font-weight: 600;
+      text-align: center; min-width: 200px; max-width: 280px; border: 2px solid; line-height: 1.4;
+    }
+    .fbox-b { border-color: #3b82f6; background: #eff6ff; color: #1e40af; }
+    .fbox-g { border-color: #10b981; background: #ecfdf5; color: #065f46; }
+    .fbox-r { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+    .fbox-a { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+    .fbox-p { border-color: #8b5cf6; background: #f5f3ff; color: #5b21b6; }
+    .fbox-k { border-color: #475569; background: #f1f5f9; color: #1e293b; }
+    .fbox .sub { font-size: 7.5pt; font-weight: 400; margin-top: 3px; color: #64748b; }
+    .arrow-down {
+      width: 2px; height: 22px; background: #94a3b8; margin: 0 auto;
+      position: relative;
+    }
+    .arrow-down::after {
+      content: '▼'; position: absolute; bottom: -10px; left: 50%;
+      transform: translateX(-50%); font-size: 9px; color: #94a3b8;
+    }
+    .flow-row { display: flex; gap: 1rem; justify-content: center; align-items: flex-start; margin: .4rem 0; }
+
+    /* ── Code block ── */
+    .code-file {
+      font-family: 'Courier New', monospace; font-size: 8.5pt;
+      background: #0f172a; color: #94a3b8;
+      border-radius: 10px; padding: 1rem 1.2rem; line-height: 2;
+    }
+    .cf-y { color: #fbbf24; }
+    .cf-g { color: #86efac; }
+    .cf-b { color: #7dd3fc; }
+    .cf-gr { color: #4b5563; }
+
+    /* ── Footer ── */
+    .doc-footer {
+      text-align: center; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;
+      font-size: 7.5pt; color: #94a3b8; margin-top: 2rem;
+    }
+
+    p { margin: .35rem 0; }
+
+    /* ══════════════════════════════════════
+       PRINT STYLES — OVERRIDES ALL ABOVE
+    ══════════════════════════════════════ */
+    @media print {
+      @page { size: A4; margin: 14mm 16mm 14mm 16mm; }
+
+      .print-btn { display: none !important; }
+
+      body { background: #fff !important; color: #111 !important; font-size: 9.5pt; }
+      .page-wrap { box-shadow: none !important; padding: 0 !important; max-width: 100%; }
+
+      /* Force white background everywhere */
+      .cover { background: #0a1628 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .step-code { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .code-file { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead tr { background: #1e3a6e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      /* Page breaks */
+      .page-break { page-break-before: always; }
+      .card, .step-item, .mt, .fbox { break-inside: avoid; }
+      .sh { break-after: avoid; }
+
+      /* Fix small font sizes */
+      .step-code, .code-file { font-size: 7.5pt; }
+      .cover-title { font-size: 18pt; }
+      .sh-title { font-size: 12pt; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+<!-- ══════════ COVER ══════════ -->
+<div class="cover">
+  <div class="cover-badge">🏭 Smart Factory IoT · ML Workflow Guide</div>
+  <div style="font-size:42px;margin:.5rem 0;">🤖</div>
+  <div class="cover-title"><span>Isolation Forest</span> ML<br>Anomaly Detection Workflow</div>
+  <div class="cover-sub">Complete Step-by-Step Guide — ApexChem Blending Works</div>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div class="meta-item"><div class="meta-label">Algorithm</div><div class="meta-val">Isolation Forest</div></div>
+    <div class="meta-item"><div class="meta-label">Hardware</div><div class="meta-val">ESP32 + SX1278 LoRa</div></div>
+    <div class="meta-item"><div class="meta-label">Features</div><div class="meta-val">7 Sensor Inputs</div></div>
+    <div class="meta-item"><div class="meta-label">Score Time</div><div class="meta-val">&lt; 1ms</div></div>
+    <div class="meta-item"><div class="meta-label">Generated</div><div class="meta-val">June 2026</div></div>
+  </div>
+</div>
+
+
+<!-- ══════════ 1. WHAT IS ISOLATION FOREST ══════════ -->
+<div class="sh"><div class="sh-num">1</div><div class="sh-title">What is Isolation Forest? (Simple Explanation)</div></div>
+
+<div class="card blue">
+  <div class="card-title">🌳 The Simple Idea — Apple Basket</div>
+  <p>Imagine you have <strong>1000 apples</strong> in a basket. 950 are normal apples. 50 are rotten (anomalies).</p>
+  <p style="margin-top:.5rem;">If you randomly divide the basket, the <strong>rotten apples get separated FIRST</strong> because they look different from the crowd. Normal apples need many more cuts to isolate.</p>
+  <p style="margin-top:.5rem;"><strong>Isolation Forest uses this same idea with sensor data</strong> — unusual readings (anomalies) get isolated in fewer random splits than normal readings.</p>
+</div>
+
+<div class="g2">
+  <div class="card green">
+    <div class="card-title">✅ Normal Reading</div>
+    <p style="font-size:9pt;">Smoke = 100, Gas = 200, Vib = 1.2</p>
+    <p style="font-size:9pt;color:#475569;">→ Blends in with crowd</p>
+    <p style="font-size:9pt;color:#475569;">→ Needs MANY cuts to isolate</p>
+    <p style="margin-top:.4rem;font-weight:700;color:#059669;">Result: NORMAL (Score = +1)</p>
+  </div>
+  <div class="card red">
+    <div class="card-title">🚨 Anomaly Reading</div>
+    <p style="font-size:9pt;">Smoke = 2000, Gas = 900, Flame = 1</p>
+    <p style="font-size:9pt;color:#475569;">→ Stands out from crowd</p>
+    <p style="font-size:9pt;color:#475569;">→ Isolated in very FEW cuts</p>
+    <p style="margin-top:.4rem;font-weight:700;color:#dc2626;">Result: ANOMALY (Score = −1)</p>
+  </div>
+</div>
+
+<div class="hb info">
+  <strong>🎯 Key Advantage:</strong> Isolation Forest does <strong>NOT need labeled data</strong>. You don't need to tag "this was a fire incident." It learns what NORMAL looks like automatically from sensor history.
+</div>
+
+
+<!-- ══════════ 2. OVERALL SYSTEM FLOW ══════════ -->
+<div class="sh green"><div class="sh-num">2</div><div class="sh-title">Overall System Flow — From Sensor to Dashboard</div></div>
+
+<div class="flow">
+  <div class="fbox fbox-b">
+    🔌 <strong>SENSOR NODE (ESP32)</strong>
+    <div class="sub">Reads: Smoke · Gas · Flame · Vibration · Distance<br>Transmits every 2 seconds via LoRa 433 MHz</div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="fbox fbox-p">
+    📡 <strong>LORA GATEWAY (ESP32 Receiver)</strong>
+    <div class="sub">Receives packet · Adds RSSI + SNR<br>Forwards via USB Serial to PC</div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="fbox fbox-k">
+    🐍 <strong>serial_bridge_ingest.py</strong>
+    <div class="sub">Reads serial port · Parses JSON packet<br>HTTP POST → Flask /api/data</div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="fbox fbox-a">
+    🤖 <strong>ML SCORING — Isolation Forest</strong>
+    <div class="sub">ml_model.score_packet() in ml_model.py<br>7 features → NORMAL / WARNING / CRITICAL in &lt;1ms</div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="flow-row">
+    <div class="fbox fbox-g" style="min-width:150px;font-size:8.5pt;">
+      ✅ <strong>NORMAL</strong>
+      <div class="sub">Store in MySQL<br>Dashboard green</div>
+    </div>
+    <div class="fbox fbox-a" style="min-width:150px;font-size:8.5pt;">
+      ⚠️ <strong>WARNING</strong>
+      <div class="sub">Store + SSE alert<br>Dashboard yellow</div>
+    </div>
+    <div class="fbox fbox-r" style="min-width:150px;font-size:8.5pt;">
+      🔴 <strong>CRITICAL</strong>
+      <div class="sub">Store + SSE + Toast<br>Auto-call manager</div>
+    </div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="fbox fbox-p">
+    📊 <strong>REACT DASHBOARD</strong>
+    <div class="sub">SSE real-time update · AI Insights Panel<br>Confidence bar per node · Anomaly history tab</div>
+  </div>
+</div>
+
+
+<!-- ══════════ 3. ALGORITHM STEPS ══════════ -->
+<div class="page-break"></div>
+<div class="sh purple"><div class="sh-num">3</div><div class="sh-title">Isolation Forest — 7 Detailed Algorithm Steps</div></div>
+
+<ul class="steps">
+
+  <li class="step-item">
+    <div class="step-num" style="background:#1e40af;">1</div>
+    <div>
+      <div class="step-title" style="color:#1e40af;">COLLECT TRAINING DATA from Database</div>
+      <div class="step-desc">
+        When Flask starts, it fetches the last <strong>2,000 sensor rows</strong> from MySQL to learn what normal looks like.<br>
+        If the database is empty, it waits — the model trains itself once enough live packets arrive.
+      </div>
+      <div class="step-code">SELECT smoke, gas, vib, distance, flame, gateway_rssi, gateway_snr
+FROM sensor_data ORDER BY id DESC LIMIT 2000</div>
+    </div>
+  </li>
+
+  <li class="step-item">
+    <div class="step-num" style="background:#059669;">2</div>
+    <div>
+      <div class="step-title" style="color:#059669;">CLEAN & PREPARE FEATURES</div>
+      <div class="step-desc">
+        Bad values are fixed before training:<br>
+        • Distance = 0 cm → replaced with 999 (sensor error / object too far)<br>
+        • RSSI = 0 dBm → replaced with −120 dBm (no signal reading)<br>
+        • Then all 7 features are scaled to the same range using StandardScaler
+      </div>
+      <div class="step-code">7 features = [smoke, gas, vib, distance, flame, rssi, snr]
+StandardScaler → normalises each feature to mean=0, std=1
+(so smoke:2000 and vib:9.5 are compared fairly)</div>
+    </div>
+  </li>
+
+  <li class="step-item">
+    <div class="step-num" style="background:#7c3aed;">3</div>
+    <div>
+      <div class="step-title" style="color:#7c3aed;">BUILD 150 ISOLATION TREES</div>
+      <div class="step-desc">
+        The algorithm grows <strong>150 random decision trees</strong>.<br>
+        Each tree: randomly picks one feature + a random split value → divides data into two halves.<br>
+        Repeats until each data point is alone (isolated).<br>
+        Fewer splits to isolate = more anomalous.
+      </div>
+      <div class="step-code">IsolationForest(n_estimators=150, contamination=0.08, random_state=42)
+model.fit(X_scaled)   ← learns NORMAL patterns from 2000 rows
+Saves to: ml_isolation_forest.joblib</div>
+    </div>
+  </li>
+
+  <li class="step-item">
+    <div class="step-num" style="background:#d97706;">4</div>
+    <div>
+      <div class="step-title" style="color:#d97706;">SCORE EVERY INCOMING PACKET (Real-Time)</div>
+      <div class="step-desc">
+        When a new sensor packet arrives (every 2 seconds):<br>
+        Step A: Extract 7 features from the packet<br>
+        Step B: Apply same scaler (must match training)<br>
+        Step C: Pass through all 150 trees → compute average isolation depth<br>
+        Step D: Decision function converts to a score
+      </div>
+      <div class="step-code">score = model.decision_function(X_scaled)  ← negative = anomalous
+label = model.predict(X_scaled)            ← -1 = anomaly, +1 = normal
+confidence = (-score + 0.5) × 100         ← convert to 0–100%</div>
+    </div>
+  </li>
+
+  <li class="step-item">
+    <div class="step-num" style="background:#dc2626;">5</div>
+    <div>
+      <div class="step-title" style="color:#dc2626;">CLASSIFY: NORMAL / WARNING / CRITICAL</div>
+      <div class="step-desc">Based on the prediction and confidence level, assign a human-readable label:</div>
+      <div class="step-code">if label == +1                       → NORMAL   (all good, no alert)
+if label == -1 AND confidence < 70%  → WARNING  (monitor closely)
+if label == -1 AND confidence >= 70% → CRITICAL (immediate action!)</div>
+    </div>
+  </li>
+
+  <li class="step-item">
+    <div class="step-num" style="background:#1e40af;">6</div>
+    <div>
+      <div class="step-title" style="color:#1e40af;">BROADCAST RESULT via SSE to Dashboard</div>
+      <div class="step-desc">
+        ML result is pushed instantly to every connected browser tab via Server-Sent Events (SSE).<br>
+        Dashboard AI panel updates in under 1 second — no page refresh needed.
+      </div>
+      <div class="step-code">SSE event: { "type": "ml_score", "node_id": "NODE_01",
+             "ml_label": "CRITICAL", "ml_confidence": 87.3,
+             "ml_reason": "Smoke=2100, Flame=YES, Gas=950" }</div>
+    </div>
+  </li>
+
+  <li class="step-item">
+    <div class="step-num" style="background:#059669;">7</div>
+    <div>
+      <div class="step-title" style="color:#059669;">AUTO-RETRAIN EVERY 200 PACKETS</div>
+      <div class="step-desc">
+        After every 200 new packets, the model re-trains itself in the background thread.<br>
+        This keeps the model updated with the latest factory conditions.<br>
+        Scoring never stops — retraining runs in parallel without any interruption.
+      </div>
+      <div class="step-code">Packet count ≥ 200 → background thread → fetch 2000 rows → retrain
+New model saved → ml_isolation_forest.joblib updated
+ml_model.py: maybe_retrain() called after every score_packet()</div>
+    </div>
+  </li>
+
+</ul>
+
+
+<!-- ══════════ 4. ANOMALY RESPONSE FLOW ══════════ -->
+<div class="sh red"><div class="sh-num">4</div><div class="sh-title">What Happens When Anomaly is Detected?</div></div>
+
+<div class="flow">
+  <div class="fbox fbox-r" style="width:290px;">
+    🔴 <strong>ML DETECTS ANOMALY</strong>
+    <div class="sub">Label = WARNING or CRITICAL · Confidence > 50%</div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="flow-row">
+    <div class="fbox fbox-b" style="min-width:155px;font-size:8.5pt;">
+      💾 <strong>Store in MySQL</strong>
+      <div class="sub">ml_label + ml_score<br>saved with sensor row</div>
+    </div>
+    <div class="fbox fbox-p" style="min-width:155px;font-size:8.5pt;">
+      📡 <strong>SSE Broadcast</strong>
+      <div class="sub">Dashboard AI panel<br>updates instantly</div>
+    </div>
+    <div class="fbox fbox-a" style="min-width:155px;font-size:8.5pt;">
+      🔔 <strong>Toast + Badge</strong>
+      <div class="sub">Red/yellow alert shown<br>in dashboard UI</div>
+    </div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="fbox fbox-r" style="width:290px;">
+    🔥 <strong>IF flame = 1 AND Auto-Call = ON</strong>
+    <div class="sub">Twilio API triggered → calls all verified numbers</div>
+  </div>
+  <div class="arrow-down"></div>
+
+  <div class="fbox fbox-g" style="width:290px;">
+    ☎️ <strong>AI VOICE CALL to Manager</strong>
+    <div class="sub">"URGENT: Flame detected on NODE_02. Immediate attention required."</div>
+  </div>
+</div>
+
+
+<!-- ══════════ 5. FEATURES TABLE ══════════ -->
+<div class="page-break"></div>
+<div class="sh amber"><div class="sh-num">5</div><div class="sh-title">7 Features Used by the ML Model</div></div>
+
+<div class="tw">
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th><th>Sensor</th><th>Normal Range</th><th>Anomaly Trigger</th><th>Why Important</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge b-a">smoke</span></td>
+        <td>MQ2 Smoke Sensor (ADC)</td>
+        <td class="td-g">100 – 800</td>
+        <td class="td-r">&gt; 1200</td>
+        <td>Fire / smoke accumulation in zone</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-a">gas</span></td>
+        <td>MQ135 Gas/VOC (ADC)</td>
+        <td class="td-g">50 – 300</td>
+        <td class="td-r">&gt; 400</td>
+        <td>Flammable gas / chemical vapor leak</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-a">vib</span></td>
+        <td>MPU6050 IMU (g-force)</td>
+        <td class="td-g">0.5 – 3.0 g</td>
+        <td class="td-r">&gt; 9.5 g</td>
+        <td>Machine malfunction / impact event</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-a">distance</span></td>
+        <td>HC-SR04 Ultrasonic (cm)</td>
+        <td class="td-g">50 – 400 cm</td>
+        <td class="td-r">&lt; 50 cm</td>
+        <td>Worker / object too close to hazard</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-a">flame</span></td>
+        <td>Flame DO Sensor (digital)</td>
+        <td class="td-g">0 (no flame)</td>
+        <td class="td-r">1 (flame!)</td>
+        <td>Direct fire detection — highest priority</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-b">rssi</span></td>
+        <td>LoRa Gateway (dBm)</td>
+        <td class="td-g">−40 to −85 dBm</td>
+        <td class="td-r">&lt; −100 dBm</td>
+        <td>Weak link = node may go offline soon</td>
+      </tr>
+      <tr>
+        <td><span class="badge b-b">snr</span></td>
+        <td>LoRa Gateway (dB)</td>
+        <td class="td-g">5 – 15 dB</td>
+        <td class="td-r">&lt; 0 dB</td>
+        <td>Signal quality — packet reliability</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════ 6. OUTPUT LABELS ══════════ -->
+<div class="sh"><div class="sh-num">6</div><div class="sh-title">ML Output Labels Explained</div></div>
+
+<div class="g3">
+  <div class="card green">
+    <div class="card-title">✅ NORMAL</div>
+    <p style="font-size:9pt;color:#475569;">All readings within expected range. No action needed.</p>
+    <p style="font-size:8.5pt;color:#059669;font-weight:700;margin-top:.4rem;">Prediction: +1<br>Confidence: 0–30%</p>
+  </div>
+  <div class="card amber">
+    <div class="card-title">⚠️ WARNING</div>
+    <p style="font-size:9pt;color:#475569;">Unusual pattern detected. Monitor closely. Yellow alert on dashboard.</p>
+    <p style="font-size:8.5pt;color:#d97706;font-weight:700;margin-top:.4rem;">Prediction: −1<br>Confidence: 30–69%</p>
+  </div>
+  <div class="card red">
+    <div class="card-title">🔴 CRITICAL</div>
+    <p style="font-size:9pt;color:#475569;">Strong anomaly. Immediate action required. Red alert + auto-call.</p>
+    <p style="font-size:8.5pt;color:#dc2626;font-weight:700;margin-top:.4rem;">Prediction: −1<br>Confidence: 70–100%</p>
+  </div>
+</div>
+
+
+<!-- ══════════ 7. KEY METRICS ══════════ -->
+<div class="sh green"><div class="sh-num">7</div><div class="sh-title">Key System Performance Metrics</div></div>
+
+<div class="g3">
+  <div class="mt"><div class="mt-icon">⚡</div><div class="mt-val">&lt;1ms</div><div class="mt-lbl">ML Score Time</div></div>
+  <div class="mt g"><div class="mt-icon">🌳</div><div class="mt-val">150</div><div class="mt-lbl">Isolation Trees</div></div>
+  <div class="mt p"><div class="mt-icon">📊</div><div class="mt-val">7</div><div class="mt-lbl">Features Used</div></div>
+  <div class="mt a"><div class="mt-icon">🔄</div><div class="mt-val">200</div><div class="mt-lbl">Pkts → Retrain</div></div>
+  <div class="mt r"><div class="mt-icon">🎯</div><div class="mt-val">8%</div><div class="mt-lbl">Contamination</div></div>
+  <div class="mt"><div class="mt-icon">💾</div><div class="mt-val">2000</div><div class="mt-lbl">Training Rows</div></div>
+</div>
+
+
+<!-- ══════════ 8. API ENDPOINTS ══════════ -->
+<div class="sh purple"><div class="sh-num">8</div><div class="sh-title">ML API Endpoints</div></div>
+
+<div class="tw">
+  <table>
+    <thead><tr><th>Endpoint</th><th>Method</th><th>Purpose</th><th>Access</th></tr></thead>
+    <tbody>
+      <tr><td class="td-b">/api/data</td><td><span class="badge b-a">POST</span></td><td>Receive sensor packet → ML scored instantly → returns ml_label</td><td><span class="badge b-b">Any</span></td></tr>
+      <tr><td class="td-b">/api/ml-status</td><td><span class="badge b-b">GET</span></td><td>Model health: training rows, packets scored, anomaly count</td><td><span class="badge b-b">JWT</span></td></tr>
+      <tr><td class="td-b">/api/ml-anomalies</td><td><span class="badge b-b">GET</span></td><td>Last 20 ML-detected anomalies with sensor values and reason</td><td><span class="badge b-b">JWT</span></td></tr>
+      <tr><td class="td-b">/api/ml-retrain</td><td><span class="badge b-a">POST</span></td><td>Manually trigger model retraining in background thread</td><td><span class="badge b-p">Manager</span></td></tr>
+      <tr><td class="td-b">/api/stream (SSE)</td><td><span class="badge b-b">GET</span></td><td>Push ml_score events to browser every 2 seconds via SSE</td><td><span class="badge b-b">Browser</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ══════════ 9. FILE STRUCTURE ══════════ -->
+<div class="sh amber"><div class="sh-num">9</div><div class="sh-title">File Structure — ML Components</div></div>
+
+<div class="code-file">
+<span class="cf-gr">smart-factory/</span>
+├── <span class="cf-y">backend/</span>
+│   ├── <span class="cf-g">app.py</span>          <span class="cf-gr">← imports ml_model, scores every packet, 3 ML routes</span>
+│   ├── <span class="cf-b">ml_model.py</span>     <span class="cf-gr">← Isolation Forest engine: train, score, retrain, status</span>
+│   ├── <span class="cf-gr">ml_isolation_forest.joblib</span>  <span class="cf-gr">← saved model (auto-created)</span>
+│   └── <span class="cf-gr">ml_scaler.joblib</span>            <span class="cf-gr">← saved scaler (auto-created)</span>
+└── <span class="cf-y">factory-pulse-ai-main/src/</span>
+    ├── <span class="cf-g">hooks/useSensorSSE.ts</span>      <span class="cf-gr">← listens for ml_score SSE events</span>
+    └── <span class="cf-b">components/AIInsights.tsx</span>   <span class="cf-gr">← live ML panel, history, retrain button</span>
+</div>
+
+<div class="hb success">
+  <strong>✅ Fully Automated:</strong> The ML model trains on startup, scores every packet in real-time (&lt;1ms), retrains every 200 packets, persists to disk, and pushes results to the dashboard — all without any manual steps.
+</div>
+
+
+<div class="doc-footer">
+  Smart Factory — ApexChem Blending Works · Isolation Forest ML Workflow Report<br>
+  Algorithm: scikit-learn IsolationForest v1.8 · Python 3.11 · Flask + MySQL + React · June 2026
+</div>
+
+</div><!-- end page-wrap -->
+
+<!-- Print Button -->
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+
+</body>
+</html>

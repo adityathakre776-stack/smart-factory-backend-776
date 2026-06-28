@@ -1,0 +1,9 @@
+Flask==3.0.3
+Flask-Cors==4.0.1
+Flask-MySQLdb==2.0.0
+Flask-JWT-Extended==4.6.0
+python-dotenv==1.0.1
+numpy==1.26.4
+scikit-learn==1.4.2
+joblib==1.4.2
+gunicorn==21.2.0

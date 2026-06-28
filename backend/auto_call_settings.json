@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "phones": [
+    "+918149407616"
+  ],
+  "cooldown_sec": 300,
+  "trigger_all_nodes": true
+}
