@@ -1199,22 +1199,31 @@ def get_nodes():
         return jsonify({"message": "Invalid token identity"}), 401
 
     cursor = mysql.connection.cursor()
-    
-    # Agar har user/company ke alag nodes hain to yeh query use karo
     cursor.execute("""
         SELECT 
             id, name, x_position AS x, y_position AS y,
             status, zone, last_seen AS lastSeen,
             voltage, temperature, vibration
         FROM nodes
-        WHERE company_id = (SELECT company_id FROM users WHERE id = %s)
         ORDER BY name
-    """, (user_id,))
-    
+    """)
     nodes = cursor.fetchall()
+    col_names = [desc[0] for desc in cursor.description]
     cursor.close()
     
-    return jsonify(nodes)
+    import datetime as dt
+    data = []
+    for row in nodes:
+        node_dict = dict(zip(col_names, row))
+        # Ensure the 'id' returned is the name (e.g. "NODE_01"), so that the frontend's
+        # selectedNode logic matches properly.
+        node_dict["id"] = node_dict["name"]
+        if isinstance(node_dict.get("lastSeen"), (dt.date, dt.datetime)):
+            node_dict["lastSeen"] = node_dict["lastSeen"].isoformat()
+        data.append(node_dict)
+        
+    return jsonify(data)
+
 
 # ───────────────── IMAGE SERVE ─────────────────
 @app.route("/uploads/<filename>")
