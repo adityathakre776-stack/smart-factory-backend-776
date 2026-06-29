@@ -480,7 +480,17 @@ def login():
     email = (data.get("email") or "").strip().lower()
     password = data.get("password")
 
-    cursor = mysql.connection.cursor()
+    try:
+        cursor = mysql.connection.cursor()
+    except Exception as e:
+        import traceback
+        return jsonify({
+            "error": "Database Connection Error on Render",
+            "message": str(e),
+            "mysql_host": app.config.get("MYSQL_HOST") or os.getenv("MYSQL_HOST"),
+            "traceback": traceback.format_exc()
+        }), 500
+
     row = None
     try:
         cursor.execute(
