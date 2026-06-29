@@ -1754,7 +1754,56 @@ def _startup_ml_training():
         print("[ML] Loaded persisted model from disk")
 
 
+def _startup_db_seeding():
+    """Seed the database with manager account and default nodes if users table is empty."""
+    import time as _t
+    _t.sleep(5)  # wait for Flask & database to initialize
+    try:
+        with app.app_context():
+            cursor = mysql.connection.cursor()
+            
+            # Check if users table exists and is empty
+            cursor.execute("SELECT COUNT(*) FROM users")
+            count = cursor.fetchone()[0]
+            if count == 0:
+                from werkzeug.security import generate_password_hash
+                cursor.execute(
+                    """
+                    INSERT INTO users (company_name, full_name, email, password_hash, role)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (
+                        "SmartFactory HQ",
+                        "Factory Manager",
+                        "manager@smartfactory.ai",
+                        generate_password_hash("Manager@123"),
+                        "manager",
+                    ),
+                )
+                print("[DB] Seeded manager account successfully!")
+            
+            # Check if nodes table exists and is empty
+            cursor.execute("SELECT COUNT(*) FROM nodes")
+            node_count = cursor.fetchone()[0]
+            if node_count == 0:
+                for node_id in ["NODE_01", "NODE_02", "NODE_03"]:
+                    cursor.execute(
+                        """
+                        INSERT INTO nodes (name, status, zone)
+                        VALUES (%s, %s, %s)
+                        """,
+                        (node_id, "online", f"Zone for {node_id}")
+                    )
+                print("[DB] Seeded default nodes successfully!")
+                
+            mysql.connection.commit()
+            cursor.close()
+    except Exception as e:
+        print(f"[DB] Startup seeding failed/skipped: {e}")
+
+
 threading.Thread(target=_startup_ml_training, daemon=True).start()
+threading.Thread(target=_startup_db_seeding, daemon=True).start()
 
 
 if __name__ == "__main__":
