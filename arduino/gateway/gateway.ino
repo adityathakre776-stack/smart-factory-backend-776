@@ -54,7 +54,7 @@ unsigned long lastLcdMs = 0;
 // =====================================================================
 const char* ssid      = "LAPTOP-5LJI46P9 1083";   // PC hotspot SSID
 const char* password  = "12345678";               // hotspot password
-const char* serverBase = "http://172.20.10.2:5000";
+const char* serverBase = "https://smart-factory-backend-776.onrender.com";
 // =====================================================================
 
 // Derived endpoints

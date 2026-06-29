@@ -9,6 +9,7 @@ const apiBaseCandidates = Array.from(
     [
       envBaseUrl,
       savedBaseUrl || undefined,
+      "https://smart-factory-backend-776.onrender.com/api",
       `http://${browserHost}:5000/api`,
       "http://172.20.10.2:5000/api",
       "http://127.0.0.1:5000/api",

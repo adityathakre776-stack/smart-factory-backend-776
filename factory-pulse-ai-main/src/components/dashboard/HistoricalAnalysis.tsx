@@ -67,7 +67,7 @@ export default function HistoricalAnalysis({ forcedNode }: Props) {
 
     try {
       const hoursParam = selectedRange === "24h" ? 24 : 1;
-      const baseUrl = (API.defaults.baseURL || "http://172.20.10.2:5000/api").replace(/\/$/, "");
+      const baseUrl = (API.defaults.baseURL || "https://smart-factory-backend-776.onrender.com/api").replace(/\/$/, "");
       const url = `${baseUrl}/sensor-data`;
 
       // Use axios directly with a 25s timeout (global API instance is 10s)

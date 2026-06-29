@@ -274,6 +274,23 @@ _hb = threading.Thread(target=_sse_heartbeat_thread, daemon=True)
 _hb.start()
 
 
+@app.route("/")
+@app.route("/api")
+@app.route("/api/")
+def api_index():
+    return jsonify({
+        "ok": True,
+        "message": "Smart Factory IoT Backend API is running successfully!",
+        "version": "1.0.0",
+        "endpoints": {
+            "health": "/api/health",
+            "stream": "/api/stream",
+            "login": "/api/login",
+            "signup": "/api/signup"
+        }
+    }), 200
+
+
 # ─────────────────────── SSE STREAM ENDPOINT ─────────────────────────
 @app.route("/api/stream")
 def sse_stream():
